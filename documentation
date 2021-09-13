@@ -1,0 +1,76 @@
+Getting started with Amazon EKS – AWS Management Console and AWS CLI
+---------------------------------------------------------------------
+Prerequisites
+Before starting this tutorial, you must install and configure the following tools and resources that you need to create and manage an Amazon EKS cluster.
+
+AWS CLI – A command line tool for working with AWS services, including Amazon EKS. This guide requires that you use version 2.2.37 or later or 1.20.40 or later.After installing the AWS CLI, we recommend that you also configure it.
+
+kubectl – A command line tool for working with Kubernetes clusters. This guide requires that you use version 1.21 or later. 
+
+Required IAM permissions – The IAM security principal that you're using must have permissions to work with Amazon EKS IAM roles and service linked roles, AWS CloudFormation, and a VPC and related resources.
+
+
+Step 1: Create your Amazon EKS cluster
+
+To create your cluster
+
+1.Create an Amazon VPC with public and private subnets that meets Amazon EKS requirements. You can replace example values with your own, but we recommend using the example values in this tutorial.
+
+aws cloudformation create-stack \
+  --region us-west-2 \
+  --stack-name my-eks-vpc-stack \
+  --template-url https://amazon-eks.s3.us-west-2.amazonaws.com/cloudformation/2020-10-29/amazon-eks-vpc-private-subnets.yaml
+
+2.Create a cluster IAM role and attach the required Amazon EKS IAM managed policy to it. Kubernetes clusters managed by Amazon EKS make calls to other AWS services on your behalf to manage the resources that you use with the service.
+
+a.copy the file named cluster-role-trust-policy.json from the git repo
+b.Create the role
+
+aws iam create-role \
+  --role-name myAmazonEKSClusterRole \
+  --assume-role-policy-document file://"cluster-role-trust-policy.json"
+
+ c.Attach the required Amazon EKS managed IAM policy to the role
+
+ aws iam attach-role-policy \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy \
+  --role-name myAmazonEKSClusterRole
+
+  Open the Amazon EKS console at https://console.aws.amazon.com/eks/home#/clusters.
+
+Make sure that the Region selected in the top right of your console is Oregon If not, select the drop-down next to the Region name and select US West (Oregon) us-west-2. Though you can create a cluster in any Amazon EKS supported Region, in this tutorial, it's created in US West (Oregon) us-west-2.
+
+Select Create cluster. If you don't see this option, in the Create EKS cluster box, enter a name for your cluster, such as my-cluster, and select Next step.
+
+On the Configure cluster page enter a name for your cluster, such as my-cluster and select myAmazonEKSClusterRole for Cluster Service Role. Leave the remaining settings at their default values and select Next.
+
+On the Specify networking page, select vpc-00x0000x000x0x000 | my-eks-vpc-stack-VPC from the VPC drop down list. Leave the remaining settings at their default values and select Next.
+
+On the Configure logging page, select Next.
+
+On the Review and create page, select Create.
+
+To the right of the cluster's name, the cluster status is Creating for several minutes until the cluster provisioning process completes. Don't continue to the next step until the status is Active. 
+
+Step 2: Configure your computer to communicate with your cluster
+In this section, you create a kubeconfig file for your cluster. The settings in this file enable the kubectl CLI to communicate with your cluster.
+
+To configure your computer to communicate with your cluster
+
+ Before connecting to cluster both the public and private subnets must be tagged with the cluster name as follows:
+
+Key : kubernetes.io/cluster/${cluster-name}
+Value: shared
+
+${cluster-name} is the name of the kubernetes cluster
+
+
+1.Create or update a kubeconfig file for your cluster. If necessary, replace us-west-2 with the Region that you created your cluster in.
+
+aws eks update-kubeconfig \
+  --region us-west-2 \
+  --name my-cluster
+
+2.Test your configuration.
+
+kubectl get svc
