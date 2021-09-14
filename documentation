@@ -14,7 +14,7 @@ Step 1: Create your Amazon EKS cluster
 
 To create your cluster
 
-1.Create an Amazon VPC with public and private subnets that meets Amazon EKS requirements. You can replace example values with your own, but we recommend using the example values in this tutorial.
+1.(optional) You can launch eks cluster in default vpc subnets also.So this step is not necessary.Create an Amazon VPC with public and private subnets that meets Amazon EKS requirements. You can replace example values with your own, but we recommend using the example values in this tutorial.
 
 aws cloudformation create-stack \
   --region us-west-2 \
