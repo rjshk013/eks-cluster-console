@@ -57,7 +57,7 @@ In this section, you create a kubeconfig file for your cluster. The settings in 
 
 To configure your computer to communicate with your cluster
 
- Before connecting to cluster both the public and private subnets must be tagged with the cluster name as follows:
+ Before connecting to cluster both the public and private subnets must be tagged with the cluster name as follows:Here we are using public subnets only
 
 Key : kubernetes.io/cluster/${cluster-name}
 Value: shared
